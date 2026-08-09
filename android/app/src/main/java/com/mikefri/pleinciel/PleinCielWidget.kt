@@ -10,7 +10,10 @@ import java.net.URL
 import org.json.JSONObject
 import kotlin.concurrent.thread
 
-class PleinCielWidget : AppWidgetProvider() {
+open class PleinCielWidget : AppWidgetProvider() {
+    open fun layoutId(): Int = R.layout.widget_plein_ciel
+    open fun detailed(): Boolean = false
+
     override fun onUpdate(context: Context, mgr: AppWidgetManager, ids: IntArray) {
         for (id in ids) updateWidget(context, mgr, id)
     }
@@ -39,16 +42,26 @@ class PleinCielWidget : AppWidgetProvider() {
                     city = o.optString("name", city)
                 }
 
-                val url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=temperature_2m,weather_code&timezone=auto"
+                val fields = if (detailed())
+                    "temperature_2m,weather_code,relative_humidity_2m,apparent_temperature,wind_speed_10m"
+                else "temperature_2m,weather_code"
+
+                val url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=" + fields + "&timezone=auto"
                 val text = URL(url).openStream().bufferedReader().use { it.readText() }
                 val cur2 = JSONObject(text).getJSONObject("current")
                 val temp = cur2.getDouble("temperature_2m").toInt()
                 val code = cur2.getInt("weather_code")
 
-                val views = RemoteViews(context.packageName, R.layout.widget_plein_ciel)
+                val views = RemoteViews(context.packageName, layoutId())
                 views.setTextViewText(R.id.widget_temp, "$temp°")
                 views.setTextViewText(R.id.widget_cond, label(code))
                 views.setTextViewText(R.id.widget_city, city)
+
+                if (detailed()) {
+                    views.setTextViewText(R.id.widget_wind, "💨 " + cur2.getDouble("wind_speed_10m").toInt() + " km/h")
+                    views.setTextViewText(R.id.widget_humidity, "💧 " + cur2.getDouble("relative_humidity_2m").toInt() + " %")
+                    views.setTextViewText(R.id.widget_feels, "🌡️ " + cur2.getDouble("apparent_temperature").toInt() + "°")
+                }
 
                 val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
                 if (intent != null) {
@@ -69,4 +82,13 @@ class PleinCielWidget : AppWidgetProvider() {
         code <= 82 -> "Averses"
         else -> "Orage"
     }
+}
+
+class PleinCielWidgetSmall : PleinCielWidget() {
+    override fun layoutId() = R.layout.widget_plein_ciel_small
+}
+
+class PleinCielWidgetLarge : PleinCielWidget() {
+    override fun layoutId() = R.layout.widget_plein_ciel_large
+    override fun detailed() = true
 }
