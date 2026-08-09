@@ -1,29 +1,22 @@
 {
   "expo": {
-    "name": "plein-ciel-app",
-    "slug": "plein-ciel-app",
-    "version": "1.0.0",
+    "name": "Plein Ciel",
+    "slug": "plein-ciel",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
+      "resizeMode": "cover",
+      "backgroundColor": "#1470c8"
     },
     "android": {
+      "package": "com.mikefri.pleinciel",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
+        "backgroundColor": "#1470c8"
+      }
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "plugins": []
   }
 }
