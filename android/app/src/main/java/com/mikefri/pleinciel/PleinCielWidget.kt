@@ -58,9 +58,9 @@ open class PleinCielWidget : AppWidgetProvider() {
                 views.setTextViewText(R.id.widget_city, city)
 
                 if (detailed()) {
-                    views.setTextViewText(R.id.widget_wind, "💨 " + cur2.getDouble("wind_speed_10m").toInt() + " km/h")
-                    views.setTextViewText(R.id.widget_humidity, "💧 " + cur2.getDouble("relative_humidity_2m").toInt() + " %")
-                    views.setTextViewText(R.id.widget_feels, "🌡️ " + cur2.getDouble("apparent_temperature").toInt() + "°")
+                    views.setTextViewText(R.id.widget_wind, cur2.getDouble("wind_speed_10m").toInt().toString() + " km/h")
+                    views.setTextViewText(R.id.widget_humidity, cur2.getDouble("relative_humidity_2m").toInt().toString() + " %")
+                    views.setTextViewText(R.id.widget_feels, cur2.getDouble("apparent_temperature").toInt().toString() + "°"
                 }
 
                 val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)

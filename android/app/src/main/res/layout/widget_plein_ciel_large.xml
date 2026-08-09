@@ -10,12 +10,15 @@
     <TextView android:id="@+id/widget_cond" android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:text="…" android:textColor="#DFFEFF" android:textSize="14sp"/>
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal" android:layout_marginTop="8dp">
+        android:orientation="horizontal" android:layout_marginTop="10dp" android:gravity="center_vertical">
+        <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_wind"/>
         <TextView android:id="@+id/widget_wind" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="💨 --" android:textColor="#DFFEFF" android:textSize="12sp"/>
+            android:text="--" android:textColor="#DFFEFF" android:textSize="13sp" android:layout_marginLeft="5dp"/>
+        <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_drop" android:layout_marginLeft="14dp"/>
         <TextView android:id="@+id/widget_humidity" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="💧 --" android:textColor="#DFFEFF" android:textSize="12sp" android:layout_marginLeft="12dp"/>
+            android:text="--" android:textColor="#DFFEFF" android:textSize="13sp" android:layout_marginLeft="5dp"/>
+        <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_thermo" android:layout_marginLeft="14dp"/>
         <TextView android:id="@+id/widget_feels" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="🌡️ --" android:textColor="#DFFEFF" android:textSize="12sp" android:layout_marginLeft="12dp"/>
+            android:text="--" android:textColor="#DFFEFF" android:textSize="13sp" android:layout_marginLeft="5dp"/>
     </LinearLayout>
 </LinearLayout>
