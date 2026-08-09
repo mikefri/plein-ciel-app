@@ -17,7 +17,20 @@ class PleinCielWidget : AppWidgetProvider() {
     private fun updateWidget(context: Context, mgr: AppWidgetManager, id: Int) {
         thread {
             try {
-                val url = "https://api.open-meteo.com/v1/forecast?latitude=48.8566&longitude=2.3522&current=temperature_2m,weather_code&timezone=auto"
+                var lat = 48.8566
+                var lon = 2.3522
+                var city = "Paris"
+
+                val prefs = context.getSharedPreferences("RKAsyncStorage", Context.MODE_PRIVATE)
+                val raw = prefs.getString("pc_widget_loc", null)
+                if (raw != null) {
+                    val o = JSONObject(raw)
+                    lat = o.optDouble("lat", lat)
+                    lon = o.optDouble("lon", lon)
+                    city = o.optString("name", city)
+                }
+
+                val url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=temperature_2m,weather_code&timezone=auto"
                 val text = URL(url).openStream().bufferedReader().use { it.readText() }
                 val cur = JSONObject(text).getJSONObject("current")
                 val temp = cur.getDouble("temperature_2m").toInt()
@@ -26,7 +39,7 @@ class PleinCielWidget : AppWidgetProvider() {
                 val views = RemoteViews(context.packageName, R.layout.widget_plein_ciel)
                 views.setTextViewText(R.id.widget_temp, "$temp°")
                 views.setTextViewText(R.id.widget_cond, label(code))
-                views.setTextViewText(R.id.widget_city, "Paris")
+                views.setTextViewText(R.id.widget_city, city)
 
                 val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
                 if (intent != null) {
