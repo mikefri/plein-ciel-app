@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import android.widget.RemoteViews
 import java.net.URL
 import org.json.JSONObject
@@ -21,8 +22,16 @@ class PleinCielWidget : AppWidgetProvider() {
                 var lon = 2.3522
                 var city = "Paris"
 
-                val prefs = context.getSharedPreferences("RKAsyncStorage", Context.MODE_PRIVATE)
-                val raw = prefs.getString("pc_widget_loc", null)
+                var raw: String? = null
+                try {
+                    val dbPath = context.getDatabasePath("RKStorage").absolutePath
+                    val db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READABLE)
+                    val cur = db.rawQuery("SELECT value FROM catalystLocalStorage WHERE key = ?", arrayOf("pc_widget_loc"))
+                    if (cur.moveToFirst()) raw = cur.getString(0)
+                    cur.close()
+                    db.close()
+                } catch (e: Exception) { }
+
                 if (raw != null) {
                     val o = JSONObject(raw)
                     lat = o.optDouble("lat", lat)
@@ -32,9 +41,9 @@ class PleinCielWidget : AppWidgetProvider() {
 
                 val url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=temperature_2m,weather_code&timezone=auto"
                 val text = URL(url).openStream().bufferedReader().use { it.readText() }
-                val cur = JSONObject(text).getJSONObject("current")
-                val temp = cur.getDouble("temperature_2m").toInt()
-                val code = cur.getInt("weather_code")
+                val cur2 = JSONObject(text).getJSONObject("current")
+                val temp = cur2.getDouble("temperature_2m").toInt()
+                val code = cur2.getInt("weather_code")
 
                 val views = RemoteViews(context.packageName, R.layout.widget_plein_ciel)
                 views.setTextViewText(R.id.widget_temp, "$temp°")
