@@ -28,7 +28,7 @@ open class PleinCielWidget : AppWidgetProvider() {
                 var raw: String? = null
                 try {
                     val dbPath = context.getDatabasePath("RKStorage").absolutePath
-                    val db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READABLE)
+                    val db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY)
                     val cur = db.rawQuery("SELECT value FROM catalystLocalStorage WHERE key = ?", arrayOf("pc_widget_loc"))
                     if (cur.moveToFirst()) raw = cur.getString(0)
                     cur.close()
