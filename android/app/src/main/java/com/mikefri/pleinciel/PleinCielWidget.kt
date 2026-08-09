@@ -42,9 +42,11 @@ open class PleinCielWidget : AppWidgetProvider() {
                     city = o.optString("name", city)
                 }
 
-                val fields = if (detailed())
+                val fields = if (detailed()) {
                     "temperature_2m,weather_code,relative_humidity_2m,apparent_temperature,wind_speed_10m"
-                else "temperature_2m,weather_code"
+                } else {
+                    "temperature_2m,weather_code"
+                }
 
                 val url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=" + fields + "&timezone=auto"
                 val text = URL(url).openStream().bufferedReader().use { it.readText() }
@@ -53,14 +55,17 @@ open class PleinCielWidget : AppWidgetProvider() {
                 val code = cur2.getInt("weather_code")
 
                 val views = RemoteViews(context.packageName, layoutId())
-                views.setTextViewText(R.id.widget_temp, "$temp°")
+                views.setTextViewText(R.id.widget_temp, temp.toString() + "°")
                 views.setTextViewText(R.id.widget_cond, label(code))
                 views.setTextViewText(R.id.widget_city, city)
 
                 if (detailed()) {
-                    views.setTextViewText(R.id.widget_wind, cur2.getDouble("wind_speed_10m").toInt().toString() + " km/h")
-                    views.setTextViewText(R.id.widget_humidity, cur2.getDouble("relative_humidity_2m").toInt().toString() + " %")
-                    views.setTextViewText(R.id.widget_feels, cur2.getDouble("apparent_temperature").toInt().toString() + "°"
+                    val wind = cur2.getDouble("wind_speed_10m").toInt()
+                    val hum = cur2.getDouble("relative_humidity_2m").toInt()
+                    val feels = cur2.getDouble("apparent_temperature").toInt()
+                    views.setTextViewText(R.id.widget_wind, wind.toString() + " km/h")
+                    views.setTextViewText(R.id.widget_humidity, hum.toString() + " %")
+                    views.setTextViewText(R.id.widget_feels, feels.toString() + "°")
                 }
 
                 val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
@@ -85,10 +90,10 @@ open class PleinCielWidget : AppWidgetProvider() {
 }
 
 class PleinCielWidgetSmall : PleinCielWidget() {
-    override fun layoutId() = R.layout.widget_plein_ciel_small
+    override fun layoutId(): Int = R.layout.widget_plein_ciel_small
 }
 
 class PleinCielWidgetLarge : PleinCielWidget() {
-    override fun layoutId() = R.layout.widget_plein_ciel_large
-    override fun detailed() = true
+    override fun layoutId(): Int = R.layout.widget_plein_ciel_large
+    override fun detailed(): Boolean = true
 }
