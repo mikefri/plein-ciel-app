@@ -41,5 +41,11 @@
     </intent-filter>
     <meta-data android:name="android.appwidget.provider" android:resource="@xml/plein_ciel_widget_info_large" />
 </receiver>
-  </application>
+          <receiver android:name=".PleinCielHoursWidget" android:exported="true" android:label="Plein Ciel (24 h)">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/plein_ciel_widget_info_hours" />
+        </receiver>
+    </application>
 </manifest>
