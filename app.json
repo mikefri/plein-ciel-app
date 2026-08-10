@@ -12,7 +12,10 @@
     },
     "android": {
       "package": "com.mikefri.pleinciel",
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1470c8"
@@ -21,8 +24,9 @@
     "plugins": [],
     "extra": {
       "eas": {
-        "projectId": "751a2fb9-afbd-44f0-887a-e57e5db352c3"
+        "projectId": "2c3f7dea-8add-4f80-80a9-54aa114606cb"
       }
-    }
+    },
+    "owner": "micfri58"
   }
 }
