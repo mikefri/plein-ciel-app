@@ -77,6 +77,7 @@ class PleinCielHoursWidget : AppWidgetProvider() {
 
                 val views = RemoteViews(context.packageName, R.layout.widget_plein_ciel_hours)
                 views.setTextViewText(R.id.widget_city2, city)
+                views.setTextViewText(R.id.widget_updt, "MAJ " + java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date()))
                 views.setImageViewBitmap(R.id.widget_chart, drawChart(labels, tv, cd, dy))
                 val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
                 if (intent != null) {
