@@ -43,9 +43,9 @@ open class PleinCielWidget : AppWidgetProvider() {
                 }
 
                 val fields = if (detailed()) {
-                    "temperature_2m,weather_code,relative_humidity_2m,apparent_temperature,wind_speed_10m"
+                    "temperature_2m,weather_code,relative_humidity_2m,apparent_temperature,wind_speed_10m,is_day"
                 } else {
-                    "temperature_2m,weather_code"
+                    "temperature_2m,weather_code,is_day"
                 }
 
                 val url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=" + fields + "&timezone=auto"
@@ -53,11 +53,13 @@ open class PleinCielWidget : AppWidgetProvider() {
                 val cur2 = JSONObject(text).getJSONObject("current")
                 val temp = cur2.getDouble("temperature_2m").toInt()
                 val code = cur2.getInt("weather_code")
+                val isDay = cur2.optInt("is_day", 1) == 1
 
                 val views = RemoteViews(context.packageName, layoutId())
                 views.setTextViewText(R.id.widget_temp, temp.toString() + "°")
                 views.setTextViewText(R.id.widget_cond, label(code))
                 views.setTextViewText(R.id.widget_city, city)
+                views.setInt(R.id.widget_root, "setBackgroundColor", widgetBg(code, isDay))
 
                 if (detailed()) {
                     val wind = cur2.getDouble("wind_speed_10m").toInt()

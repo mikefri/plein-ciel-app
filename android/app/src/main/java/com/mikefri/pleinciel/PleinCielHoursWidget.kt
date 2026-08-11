@@ -79,6 +79,7 @@ class PleinCielHoursWidget : AppWidgetProvider() {
                 views.setTextViewText(R.id.widget_city2, city)
                 views.setTextViewText(R.id.widget_updt, "MAJ " + java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date()))
                 views.setImageViewBitmap(R.id.widget_chart, drawChart(labels, tv, cd, dy))
+                views.setInt(R.id.widget_root2, "setBackgroundColor", widgetBg(cd.firstOrNull() ?: 0, dy.firstOrNull() ?: true))
                 val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
                 if (intent != null) {
                     val pi = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
