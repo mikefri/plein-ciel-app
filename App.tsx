@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { BackHandler, PermissionsAndroid, Platform, StatusBar, View } from 'react-native';
+import { BackHandler, Platform, StatusBar, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
@@ -8,8 +8,9 @@ import * as BackgroundFetch from 'expo-background-fetch';
 
 const SITE_URL = 'https://mikefri.github.io/Plein_Ciel/';
 const TASK_NAME = 'pleinciel-background-check';
+const CHANNEL_ID = 'pleinciel-alerts';
 
-// Configure les notifications (apparaissent même appli fermée)
+// Configure les notifications
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -31,7 +32,6 @@ TaskManager.defineTask(TASK_NAME, async () => {
     const lon = loc.lon || 2.35;
     const city = loc.name || 'Plein Ciel';
     
-    // Vérifie les 3 prochaines heures
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=weather_code&timezone=auto&forecast_days=1`;
     const response = await fetch(url);
     const data = await response.json();
@@ -40,7 +40,6 @@ TaskManager.defineTask(TASK_NAME, async () => {
     const hourIndex = now.getHours();
     const codes = data.hourly?.weather_code || [];
     
-    // Cherche un orage (95-99) dans les 3 prochaines heures
     for (let i = hourIndex; i < Math.min(hourIndex + 3, 24); i++) {
       const code = codes[i];
       if (code >= 95 && code <= 99) {
@@ -80,24 +79,34 @@ const INJECTED = `
 true;
 `;
 
-async function requestPermissions() {
-  if (Platform.OS !== 'android') return;
-  try {
-    await PermissionsAndroid.requestMultiple([
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
-      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-    ]);
-  } catch (e) {}
+async function setupNotifications() {
+  // 1. Crée le canal de notification (Android 8+)
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
+      name: 'Alertes orage',
+      importance: Notifications.AndroidImportance.HIGH,
+      sound: 'default',
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#1470c8',
+    });
+  }
+  
+  // 2. Demande la permission (méthode officielle expo-notifications)
+  const { status: existing } = await Notifications.getPermissionsAsync();
+  if (existing !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync({
+      android: { allowAlert: true, allowBadge: true, allowSound: true },
+    });
+    console.log('Permission notifications:', status);
+  }
 }
 
 export default function App() {
   const ref = useRef(null);
 
   useEffect(() => {
-    requestPermissions();
+    setupNotifications();
     
-    // Enregistre la tâche de fond (toutes les 15 min minimum)
     BackgroundFetch.registerTaskAsync(TASK_NAME, {
       minimumInterval: 15 * 60,
       stopOnTerminate: false,
@@ -115,10 +124,21 @@ export default function App() {
     try {
       const data = event.nativeEvent.data;
       
-      // Stocke la localisation (pour les widgets et la tâche de fond)
+      // COMMANDE DE TEST : si le site envoie "test_notification", on envoie une notif
+      if (data === 'test_notification') {
+        await Notifications.scheduleNotificationAsync({
+          content: {
+            title: '🔔 Test Plein Ciel',
+            body: 'Les notifications fonctionnent ! ✅',
+            sound: 'default',
+          },
+          trigger: null,
+        });
+        return;
+      }
+      
       await AsyncStorage.setItem('pc_widget_loc', data);
       
-      // Si c'est un message d'alerte orage, affiche une notification système
       if (data.startsWith('alert:')) {
         const alertData = JSON.parse(data.substring(6));
         await Notifications.scheduleNotificationAsync({
